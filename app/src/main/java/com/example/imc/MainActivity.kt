@@ -1,14 +1,18 @@
 package com.example.imc
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -24,7 +28,6 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    // Por ahora solo mostramos la pantalla de ingreso directamente
                     val navController = rememberNavController()
                     PantallaIngreso(navController = navController)
                 }
@@ -35,6 +38,12 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun PantallaIngreso(navController: NavController) {
+    // Variables de estado usando remember
+    var nombre by remember { mutableStateOf("") }
+    var pesoStr by remember { mutableStateOf("") }
+    var alturaStr by remember { mutableStateOf("") }
+    var mostrarError by remember { mutableStateOf(false) }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -55,8 +64,8 @@ fun PantallaIngreso(navController: NavController) {
 
         // Campo 1: Nombre
         TextField(
-            value = "", // Sin estado por ahora
-            onValueChange = {},
+            value = nombre,
+            onValueChange = { nombre = it },
             label = { Text("Nombre del usuario") },
             modifier = Modifier.fillMaxWidth(),
             singleLine = true
@@ -66,28 +75,51 @@ fun PantallaIngreso(navController: NavController) {
 
         // Campo 2: Peso
         TextField(
-            value = "", // Sin estado por ahora
-            onValueChange = {},
+            value = pesoStr,
+            onValueChange = { pesoStr = it },
             label = { Text("Peso (en kg)") },
             modifier = Modifier.fillMaxWidth(),
-            singleLine = true
+            singleLine = true,
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
         )
 
         Spacer(modifier = Modifier.height(16.dp))
 
         // Campo 3: Altura
         TextField(
-            value = "", // Sin estado por ahora
-            onValueChange = {},
+            value = alturaStr,
+            onValueChange = { alturaStr = it },
             label = { Text("Altura (en metros)") },
             modifier = Modifier.fillMaxWidth(),
-            singleLine = true
+            singleLine = true,
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
         )
 
         Spacer(modifier = Modifier.height(20.dp))
 
+        // Mostrar error si los campos son inválidos
+        if (mostrarError) {
+            Text(
+                text = "Por favor, ingresa valores válidos",
+                color = Color.Red,
+                fontWeight = FontWeight.Medium,
+                modifier = Modifier.padding(bottom = 16.dp)
+            )
+        }
+
         Button(
-            onClick = { /* Acción vacía por ahora */ },
+            onClick = {
+                val peso = pesoStr.toFloatOrNull()
+                val altura = alturaStr.toFloatOrNull()
+
+                if (nombre.isNotBlank() && peso != null && peso > 0 && altura != null && altura > 0) {
+                    mostrarError = false
+                    val imc = peso / (altura * altura)
+                    Log.d("IMC_Calculadora", "Nombre: $nombre, IMC: $imc")
+                } else {
+                    mostrarError = true
+                }
+            },
             modifier = Modifier.fillMaxWidth()
         ) {
             Text(text = "Calcular", fontSize = 16.sp)
