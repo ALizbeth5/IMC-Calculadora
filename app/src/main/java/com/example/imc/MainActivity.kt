@@ -141,6 +141,11 @@ fun PantallaIngreso(navController: NavController) {
                     mostrarError = false
                     val imc = peso / (altura * altura)
                     navController.navigate("resultado/${nombre.trim()}/$imc")
+                    
+                    // Limpieza de campos para cuando el usuario regrese
+                    nombre = ""
+                    pesoStr = ""
+                    alturaStr = ""
                 } else {
                     mostrarError = true
                 }
@@ -154,7 +159,6 @@ fun PantallaIngreso(navController: NavController) {
 
 @Composable
 fun PantallaResultado(navController: NavController, nombre: String, imc: Float) {
-    // Lógica para determinar categoría y color según el IMC
     val categoria: String
     val colorCategoria: Color
 
@@ -165,11 +169,11 @@ fun PantallaResultado(navController: NavController, nombre: String, imc: Float) 
         }
         imc < 25.0f -> {
             categoria = "Peso normal"
-            colorCategoria = Color(0xFF4CAF50) // Verde
+            colorCategoria = Color(0xFF4CAF50)
         }
         imc < 30.0f -> {
             categoria = "Sobrepeso"
-            colorCategoria = Color(0xFFFFA500) // Naranja
+            colorCategoria = Color(0xFFFFA500)
         }
         else -> {
             categoria = "Obesidad"
@@ -192,16 +196,25 @@ fun PantallaResultado(navController: NavController, nombre: String, imc: Float) 
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        Text(
-            text = String.format(Locale.getDefault(), "%.1f", imc),
-            fontSize = 48.sp,
-            fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.primary
-        )
+        // Requisito: Uso de Row para organizar la interfaz
+        Row(verticalAlignment = Alignment.Bottom) {
+            Text(
+                text = String.format(Locale.getDefault(), "%.1f", imc),
+                fontSize = 64.sp,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.primary
+            )
+            Text(
+                text = " IMC",
+                fontSize = 24.sp,
+                fontWeight = FontWeight.SemiBold,
+                color = Color.Gray,
+                modifier = Modifier.padding(bottom = 12.dp)
+            )
+        }
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        // Nueva categoría con color dinámico
         Text(
             text = categoria,
             fontSize = 24.sp,
@@ -209,7 +222,7 @@ fun PantallaResultado(navController: NavController, nombre: String, imc: Float) 
             color = colorCategoria
         )
 
-        Spacer(modifier = Modifier.height(32.dp))
+        Spacer(modifier = Modifier.height(48.dp))
 
         Button(
             onClick = { navController.popBackStack() },
