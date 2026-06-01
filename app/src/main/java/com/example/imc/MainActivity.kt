@@ -1,7 +1,6 @@
 package com.example.imc
 
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.*
@@ -17,7 +16,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import androidx.navigation.NavType
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -28,8 +31,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    val navController = rememberNavController()
-                    PantallaIngreso(navController = navController)
+                    AppNavigation()
                 }
             }
         }
@@ -37,8 +39,32 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
+fun AppNavigation() {
+    val navController = rememberNavController()
+
+    NavHost(navController = navController, startDestination = "ingreso") {
+        composable("ingreso") {
+            PantallaIngreso(navController = navController)
+        }
+        composable(
+            route = "resultado/{nombre}/{imc}",
+            arguments = listOf(
+                navArgument("nombre") { type = NavType.StringType },
+                navArgument("imc") { type = NavType.FloatType }
+            )
+        ) { backStackEntry ->
+            // Placeholder para la pantalla de resultados
+            val nombre = backStackEntry.arguments?.getString("nombre")
+            val imc = backStackEntry.arguments?.getFloat("imc")
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                Text(text = "Pantalla de Resultado: $nombre tiene un IMC de $imc")
+            }
+        }
+    }
+}
+
+@Composable
 fun PantallaIngreso(navController: NavController) {
-    // Variables de estado usando remember
     var nombre by remember { mutableStateOf("") }
     var pesoStr by remember { mutableStateOf("") }
     var alturaStr by remember { mutableStateOf("") }
@@ -62,7 +88,6 @@ fun PantallaIngreso(navController: NavController) {
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        // Campo 1: Nombre
         TextField(
             value = nombre,
             onValueChange = { nombre = it },
@@ -73,7 +98,6 @@ fun PantallaIngreso(navController: NavController) {
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Campo 2: Peso
         TextField(
             value = pesoStr,
             onValueChange = { pesoStr = it },
@@ -85,7 +109,6 @@ fun PantallaIngreso(navController: NavController) {
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Campo 3: Altura
         TextField(
             value = alturaStr,
             onValueChange = { alturaStr = it },
@@ -97,7 +120,6 @@ fun PantallaIngreso(navController: NavController) {
 
         Spacer(modifier = Modifier.height(20.dp))
 
-        // Mostrar error si los campos son inválidos
         if (mostrarError) {
             Text(
                 text = "Por favor, ingresa valores válidos",
@@ -115,7 +137,8 @@ fun PantallaIngreso(navController: NavController) {
                 if (nombre.isNotBlank() && peso != null && peso > 0 && altura != null && altura > 0) {
                     mostrarError = false
                     val imc = peso / (altura * altura)
-                    Log.d("IMC_Calculadora", "Nombre: $nombre, IMC: $imc")
+                    // Navegar a la pantalla de resultado pasando los parámetros
+                    navController.navigate("resultado/${nombre.trim()}/$imc")
                 } else {
                     mostrarError = true
                 }
