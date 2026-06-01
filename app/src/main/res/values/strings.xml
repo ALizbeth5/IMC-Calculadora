@@ -1,0 +1,19 @@
+<resources>
+    <string name="app_name">IMC</string>
+    <string name="user_placeholder">Usuario</string>
+    <string name="default_imc">0.0</string>
+    <string name="app_title">Calculadora de IMC</string>
+    <string name="label_name">Nombre del usuario</string>
+    <string name="label_weight">Peso (en kg)</string>
+    <string name="placeholder_weight">Ej: 72.5</string>
+    <string name="label_height">Altura (en metros)</string>
+    <string name="placeholder_height">Ej: 1.75</string>
+    <string name="error_invalid_values">Por favor, ingresa valores válidos</string>
+    <string name="btn_calculate">Calcular</string>
+    <string name="cat_underweight">Bajo peso</string>
+    <string name="cat_normal">Peso normal</string>
+    <string name="cat_overweight">Sobrepeso</string>
+    <string name="cat_obese">Obesidad</string>
+    <string name="result_greeting">Hola %1$s, tu resultado es:</string>
+    <string name="btn_back">Volver</string>
+</resources>
