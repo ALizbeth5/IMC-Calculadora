@@ -9,6 +9,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
@@ -125,7 +126,7 @@ fun PantallaIngreso(navController: NavController) {
         if (mostrarError) {
             Text(
                 text = "Por favor, ingresa valores válidos",
-                color = androidx.compose.ui.graphics.Color.Red,
+                color = Color.Red,
                 fontWeight = FontWeight.Medium,
                 modifier = Modifier.padding(bottom = 16.dp)
             )
@@ -153,6 +154,29 @@ fun PantallaIngreso(navController: NavController) {
 
 @Composable
 fun PantallaResultado(navController: NavController, nombre: String, imc: Float) {
+    // Lógica para determinar categoría y color según el IMC
+    val categoria: String
+    val colorCategoria: Color
+
+    when {
+        imc < 18.5f -> {
+            categoria = "Bajo peso"
+            colorCategoria = Color.Red
+        }
+        imc < 25.0f -> {
+            categoria = "Peso normal"
+            colorCategoria = Color(0xFF4CAF50) // Verde
+        }
+        imc < 30.0f -> {
+            categoria = "Sobrepeso"
+            colorCategoria = Color(0xFFFFA500) // Naranja
+        }
+        else -> {
+            categoria = "Obesidad"
+            colorCategoria = Color.Red
+        }
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -173,6 +197,16 @@ fun PantallaResultado(navController: NavController, nombre: String, imc: Float) 
             fontSize = 48.sp,
             fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.primary
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        // Nueva categoría con color dinámico
+        Text(
+            text = categoria,
+            fontSize = 24.sp,
+            fontWeight = FontWeight.Bold,
+            color = colorCategoria
         )
 
         Spacer(modifier = Modifier.height(32.dp))
