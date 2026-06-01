@@ -9,7 +9,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
@@ -21,6 +20,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import java.util.Locale
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -53,12 +53,14 @@ fun AppNavigation() {
                 navArgument("imc") { type = NavType.FloatType }
             )
         ) { backStackEntry ->
-            // Placeholder para la pantalla de resultados
-            val nombre = backStackEntry.arguments?.getString("nombre")
-            val imc = backStackEntry.arguments?.getFloat("imc")
-            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                Text(text = "Pantalla de Resultado: $nombre tiene un IMC de $imc")
-            }
+            val nombre = backStackEntry.arguments?.getString("nombre") ?: ""
+            val imc = backStackEntry.arguments?.getFloat("imc") ?: 0f
+            
+            PantallaResultado(
+                navController = navController,
+                nombre = nombre,
+                imc = imc
+            )
         }
     }
 }
@@ -123,7 +125,7 @@ fun PantallaIngreso(navController: NavController) {
         if (mostrarError) {
             Text(
                 text = "Por favor, ingresa valores válidos",
-                color = Color.Red,
+                color = androidx.compose.ui.graphics.Color.Red,
                 fontWeight = FontWeight.Medium,
                 modifier = Modifier.padding(bottom = 16.dp)
             )
@@ -137,7 +139,6 @@ fun PantallaIngreso(navController: NavController) {
                 if (nombre.isNotBlank() && peso != null && peso > 0 && altura != null && altura > 0) {
                     mostrarError = false
                     val imc = peso / (altura * altura)
-                    // Navegar a la pantalla de resultado pasando los parámetros
                     navController.navigate("resultado/${nombre.trim()}/$imc")
                 } else {
                     mostrarError = true
@@ -146,6 +147,41 @@ fun PantallaIngreso(navController: NavController) {
             modifier = Modifier.fillMaxWidth()
         ) {
             Text(text = "Calcular", fontSize = 16.sp)
+        }
+    }
+}
+
+@Composable
+fun PantallaResultado(navController: NavController, nombre: String, imc: Float) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(24.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Text(
+            text = "Hola $nombre, tu resultado es:",
+            fontSize = 22.sp,
+            fontWeight = FontWeight.Medium
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Text(
+            text = String.format(Locale.getDefault(), "%.1f", imc),
+            fontSize = 48.sp,
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.primary
+        )
+
+        Spacer(modifier = Modifier.height(32.dp))
+
+        Button(
+            onClick = { navController.popBackStack() },
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text(text = "Volver", fontSize = 16.sp)
         }
     }
 }
